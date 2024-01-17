@@ -1,6 +1,14 @@
 package Model;
 
-public class Gracz {
+public abstract class Gracz {
+
+    /**
+     * Determines how the game is updated. If true, the user must interact with
+     * the user interface to make a move. Otherwise, the game is updated vi
+     *
+     * @return true if this player represents a user.
+     */
+    public abstract boolean isHuman();
 
     /**
      * Updates the game state to take a move for the current player. If there
@@ -9,6 +17,10 @@ public class Gracz {
      *
      * @param game	the game to update.
      */
-    public void updateGame(Gra game){}
+    public abstract void updateGame(Gra game);
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[isHuman=" + isHuman() + "]";
+    }
 }

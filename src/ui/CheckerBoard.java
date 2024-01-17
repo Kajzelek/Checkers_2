@@ -15,6 +15,8 @@ import javax.swing.JButton;
 import javax.swing.Timer;
 
 import Logika.GenerujRuch;
+import Model.HumanPlayer;
+import Model.NetworkPlayer;
 import Model.Gracz;
 import Model.Gra;
 import Model.Plansza;
@@ -68,8 +70,8 @@ public class CheckerBoard extends JButton{
         this(window, new Gra(), null, null);
     }
 
-    public CheckerBoard(CheckersWindow window, Game game,
-                        Player player1, Player player2) {
+    public CheckerBoard(CheckersWindow window, Gra game,
+                        Gracz player1, Gracz player2) {
 
         // Setup the component
         super.setBorderPainted(false);
@@ -99,7 +101,7 @@ public class CheckerBoard extends JButton{
     private void runPlayer() {
 
         // Nothing to do
-        Player player = getCurrentPlayer();
+        Gracz player = getCurrentPlayer();
         if (player == null || player.isHuman() ||
                 player instanceof NetworkPlayer) {
             return;
@@ -175,7 +177,7 @@ public class CheckerBoard extends JButton{
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-        Game game = this.game.copy();
+        Gra game = this.game.copy();
 
         // Perform calculations
         final int BOX_PADDING = 4;
@@ -199,7 +201,7 @@ public class CheckerBoard extends JButton{
         }
 
         // Highlight the selected tile if valid
-        if (Board.isValidPoint(selected)) {
+        if (Plansza.isValidPoint(selected)) {
             g.setColor(selectionValid? Color.GREEN : Color.RED);
             g.fillRect(OFFSET_X + selected.x * BOX_SIZE,
                     OFFSET_Y + selected.y * BOX_SIZE,
@@ -207,21 +209,21 @@ public class CheckerBoard extends JButton{
         }
 
         // Draw the checkers
-        Board b = game.getBoard();
+        Plansza b = game.getBoard();
         for (int y = 0; y < 8; y ++) {
             int cy = OFFSET_Y + y * BOX_SIZE + BOX_PADDING;
             for (int x = (y + 1) % 2; x < 8; x += 2) {
                 int id = b.get(x, y);
 
                 // Empty, just skip
-                if (id == Board.EMPTY) {
+                if (id == Plansza.EMPTY) {
                     continue;
                 }
 
                 int cx = OFFSET_X + x * BOX_SIZE + BOX_PADDING;
 
                 // Black checker
-                if (id == Board.BLACK_CHECKER) {
+                if (id == Plansza.BLACK_CHECKER) {
                     g.setColor(Color.DARK_GRAY);
                     g.fillOval(cx + 1, cy + 2, CHECKER_SIZE, CHECKER_SIZE);
                     g.setColor(Color.LIGHT_GRAY);
@@ -233,7 +235,7 @@ public class CheckerBoard extends JButton{
                 }
 
                 // Black king
-                else if (id == Board.BLACK_KING) {
+                else if (id == Plansza.BLACK_KING) {
                     g.setColor(Color.DARK_GRAY);
                     g.fillOval(cx + 1, cy + 2, CHECKER_SIZE, CHECKER_SIZE);
                     g.setColor(Color.LIGHT_GRAY);
@@ -247,7 +249,7 @@ public class CheckerBoard extends JButton{
                 }
 
                 // White checker
-                else if (id == Board.WHITE_CHECKER) {
+                else if (id == Plansza.WHITE_CHECKER) {
                     g.setColor(Color.LIGHT_GRAY);
                     g.fillOval(cx + 1, cy + 2, CHECKER_SIZE, CHECKER_SIZE);
                     g.setColor(Color.DARK_GRAY);
@@ -259,7 +261,7 @@ public class CheckerBoard extends JButton{
                 }
 
                 // White king
-                else if (id == Board.WHITE_KING) {
+                else if (id == Plansza.WHITE_KING) {
                     g.setColor(Color.LIGHT_GRAY);
                     g.fillOval(cx + 1, cy + 2, CHECKER_SIZE, CHECKER_SIZE);
                     g.setColor(Color.DARK_GRAY);
@@ -273,7 +275,7 @@ public class CheckerBoard extends JButton{
                 }
 
                 // Any king (add some extra highlights)
-                if (Board.isKingChecker(id)) {
+                if (Plansza.isKingChecker(id)) {
                     g.setColor(new Color(255, 240, 0));
                     g.drawOval(cx - 1, cy - 2, CHECKER_SIZE, CHECKER_SIZE);
                     g.drawOval(cx + 1, cy, CHECKER_SIZE - 4, CHECKER_SIZE - 4);
@@ -306,12 +308,12 @@ public class CheckerBoard extends JButton{
         }
     }
 
-    public Game getGame() {
+    public Gra getGame() {
         return game;
     }
 
-    public void setGame(Game game) {
-        this.game = (game == null)? new Game() : game;
+    public void setGame(Gra game) {
+        this.game = (game == null)? new Gra() : game;
     }
 
     public CheckersWindow getWindow() {
@@ -322,29 +324,29 @@ public class CheckerBoard extends JButton{
         this.window = window;
     }
 
-    public Player getPlayer1() {
+    public Gracz getPlayer1() {
         return player1;
     }
 
-    public void setPlayer1(Player player1) {
+    public void setPlayer1(Gracz player1) {
         this.player1 = (player1 == null)? new HumanPlayer() : player1;
         if (game.isP1Turn() && !this.player1.isHuman()) {
             this.selected = null;
         }
     }
 
-    public Player getPlayer2() {
+    public Gracz getPlayer2() {
         return player2;
     }
 
-    public void setPlayer2(Player player2) {
+    public void setPlayer2(Gracz player2) {
         this.player2 = (player2 == null)? new HumanPlayer() : player2;
         if (!game.isP1Turn() && !this.player2.isHuman()) {
             this.selected = null;
         }
     }
 
-    public Player getCurrentPlayer() {
+    public Gracz getCurrentPlayer() {
         return game.isP1Turn()? player1 : player2;
     }
 
@@ -380,7 +382,7 @@ public class CheckerBoard extends JButton{
             return;
         }
 
-        Game copy = game.copy();
+        Gra copy = game.copy();
 
         // Determine what square (if any) was selected
         final int W = getWidth(), H = getHeight();
@@ -392,7 +394,7 @@ public class CheckerBoard extends JButton{
         Point sel = new Point(x, y);
 
         // Determine if a move should be attempted
-        if (Board.isValidPoint(sel) && Board.isValidPoint(selected)) {
+        if (Plansza.isValidPoint(sel) && Plansza.isValidPoint(selected)) {
             boolean change = copy.isP1Turn();
             String expected = copy.getGameState();
             boolean move = copy.move(selected, sel);
@@ -424,31 +426,31 @@ public class CheckerBoard extends JButton{
      * @return true if and only if the selected point is a checker that would
      * be allowed to make a move in the current turn.
      */
-    private boolean isValidSelection(Board b, boolean isP1Turn, Point selected) {
+    private boolean isValidSelection(Plansza b, boolean isP1Turn, Point selected) {
 
         // Trivial cases
-        int i = Board.toIndex(selected), id = b.get(i);
-        if (id == Board.EMPTY || id == Board.INVALID) { // no checker here
+        int i = Plansza.toIndex(selected), id = b.get(i);
+        if (id == Plansza.EMPTY || id == Plansza.INVALID) { // no checker here
             return false;
-        } else if(isP1Turn ^ Board.isBlackChecker(id)) { // wrong checker
+        } else if(isP1Turn ^ Plansza.isBlackChecker(id)) { // wrong checker
             return false;
-        } else if (!MoveGenerator.getSkips(b, i).isEmpty()) { // skip available
+        } else if (!GenerujRuch.getSkips(b, i).isEmpty()) { // skip available
             return true;
-        } else if (MoveGenerator.getMoves(b, i).isEmpty()) { // no moves
+        } else if (GenerujRuch.getMoves(b, i).isEmpty()) { // no moves
             return false;
         }
 
         // Determine if there is a skip available for another checker
         List<Point> points = b.find(
-                isP1Turn? Board.BLACK_CHECKER : Board.WHITE_CHECKER);
+                isP1Turn? Plansza.BLACK_CHECKER : Plansza.WHITE_CHECKER);
         points.addAll(b.find(
-                isP1Turn? Board.BLACK_KING : Board.WHITE_KING));
+                isP1Turn? Plansza.BLACK_KING : Plansza.WHITE_KING));
         for (Point p : points) {
-            int checker = Board.toIndex(p);
+            int checker = Plansza.toIndex(p);
             if (checker == i) {
                 continue;
             }
-            if (!MoveGenerator.getSkips(b, checker).isEmpty()) {
+            if (!GenerujRuch.getSkips(b, checker).isEmpty()) {
                 return false;
             }
         }

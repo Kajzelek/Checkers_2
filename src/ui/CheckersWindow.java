@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Model.Gracz;
+import Siec.CheckersNetworkHandler;
 import Siec.ConnectionListener;
 import Siec.Session;
 
@@ -75,7 +76,7 @@ public class CheckersWindow extends JFrame{
      *
      * @param player1	the new player instance to control player 1.
      */
-    public void setPlayer1(Player player1) {
+    public void setPlayer1(Gracz player1) {
         this.board.setPlayer1(player1);
         this.board.update();
     }
@@ -85,7 +86,7 @@ public class CheckersWindow extends JFrame{
      *
      * @param player2	the new player instance to control player 2.
      */
-    public void setPlayer2(Player player2) {
+    public void setPlayer2(Gracz player2) {
         this.board.setPlayer2(player2);
         this.board.update();
     }
